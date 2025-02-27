@@ -81,7 +81,7 @@ $$
 故SVM可转化为优化问题：
 
 $$
-MIN \ J(\mathbf{w}) = \frac{1}{2} \mathbf{w}^T \mathbf{w}
+\text{MIN} \ J(\mathbf{w}) = \frac{1}{2} \mathbf{w}^T \mathbf{w}
 $$
 
 $$
@@ -145,7 +145,6 @@ $$
 K \left[ \mathbf{x}, \mathbf{x}(i) \right] =
 \boldsymbol{\varphi} (\mathbf{x})^T \boldsymbol{\varphi} \left[ \mathbf{x}(i) \right] 
 = \sum_{j=0}^{m} \varphi_j (\mathbf{x}) \varphi_j \left[ \mathbf{x}(i) \right]
-
 $$
 
 **Mercer's Theorem 默瑟定理**
@@ -156,7 +155,6 @@ $$
 
 $$
 \forall \mathbf{v} \in \mathbb{R}^{N}, \quad \mathbf{v}^T K \mathbf{v} \geq 0
-
 $$
 
 转换后，无需显示计算 $\mathbf{w}$ ,其表达式转化为：
@@ -169,7 +167,6 @@ $$
     &= \sum_{i=1}^{N} \alpha_i d_i K(\mathbf{x}_i, \mathbf{x}) + b
 
 \end{aligned}
-
 $$
 
 常见的核函数包括：

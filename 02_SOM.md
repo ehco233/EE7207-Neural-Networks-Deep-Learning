@@ -9,12 +9,14 @@ SOM 自组织映射 提出是基于神经生物学。
 SOM 是将任意维度的输入转化为1-D或2-D的输出，并保持输入数据的拓扑特征。简单来说，是一种非线性降维技术，保留了输入数据的拓扑特征。
 
 基本组成包括：
+
 - 1D 或者 2D 的输出神经元，计算输入信号的判别函数
 - 通过判别函数 选出获胜的神经元
 - 自适应过程：获胜的神经元和其邻居神经元的权重更新
 - 交互网络：获胜的神经元激活其邻居神经元
 
 **训练过程中的核心过程：**
+
 - 竞争 competition
   通过计算判别函数（discriminant function）来选出获胜的神经元
 - 合作 cooperation
@@ -27,78 +29,110 @@ SOM 是将任意维度的输入转化为1-D或2-D的输出，并保持输入数�
 判别函数主要用来度量输入向量 与 每个神经元权重之间的相似度。可通过内积 $W_i^T X$计算。
 
 在实际的操作过程中，通常将权重归一化之后，选用欧式距离计算。
+
 - 权重归一化之后，最大化内积等于最小化距离
   内积为：
-    $$ \mathbf{w}_j^T \mathbf{x} = \|\mathbf{w}_j\| \|\mathbf{x}\| \cos \theta = \|\mathbf{x}\| \cos \theta $$
-  
-  距离为：  
 
-    $$ d = \|\mathbf{x} - \mathbf{w}\| $$  
+  $$
+  \mathbf{w}_j^T \mathbf{x} = \|\mathbf{w}_j\| \|\mathbf{x}\| \cos \theta = \|\mathbf{x}\| \cos \theta
+  $$
 
-    $$ d^2 = \|\mathbf{x}\|^2 - 2 \mathbf{w}^T \mathbf{x} + \|\mathbf{w}\|^2 $$  
+  距离为：
 
-    因为：$\|\mathbf{w}\| = 1, \text{ 则:} $
+  $$
+  d = \|\mathbf{x} - \mathbf{w}\| $$  
 
-    $$ d^2 = \|\mathbf{x}\|^2 - 2 \|\mathbf{x}\| \cos \theta + 1 $$
+  $$ d^2 = \|\mathbf{x}\|^2 - 2 \mathbf{w}^T \mathbf{x} + \|\mathbf{w}\|^2 $$  
 
-    故：内积最大表示$\theta$最小，即对应距离最小。
+  因为：$\|\mathbf{w}\| = 1, \text{ 则:} $
 
-    $$ \arg\min_j \|\mathbf{x} - \mathbf{w}_j\|^2 \iff \arg\max_j \mathbf{w}_j^T \mathbf{x} $$
+  $$ d^2 = \|\mathbf{x}\|^2 - 2 \|\mathbf{x}\| \cos \theta + 1
+  $$
+
+  故：内积最大表示$\theta$最小，即对应距离最小。
+
+  $$
+  arg\min_j \|\mathbf{x} - \mathbf{w}_j\|^2 \iff \arg\max_j \mathbf{w}_j^T \mathbf{x}
+  $$
 
 **合作过程**
 
 获胜神经元被激活后，其周围的神经元也会被激活。$h_{ji}$ 为拓扑邻域，$d_{ji}$ 为横向距离。$h_{ji}$是$d_{ji}$的函数，需要满足以下两点要求：
+
 - 对称性。即在获胜神经元处达到最大值
 - 单调递减。随着距离的增加而单调递减
 
 **典型的$h_{ji}$为高斯函数：**
-$$ h_{ji} = \exp\left(-\frac{d_{ji}^2}{2\sigma^2}\right) $$
+
+$$
+h_{ji} = \exp\left(-\frac{d_{ji}^2}{2\sigma^2}\right)
+$$
 
 其中，$\sigma$为拓扑邻域的宽度. $d_{ji}$为在**输出空间**的距离，而不是在原始空间的距离。
 
 随着学习过程的进行，$\sigma$逐渐减小，拓扑邻域也逐渐缩小。典型的变化形式是指数缩减
 
-$$ \sigma(n)  = \sigma_0\exp\left(-\frac{n}{\tau_1}\right) $$
+$$
+\sigma(n)  = \sigma_0\exp\left(-\frac{n}{\tau_1}\right)
+$$
+
 其中，$\sigma_0$为初始值，$\tau_1$为时间常数，控制衰减速度。
 
 故邻域拓扑函数更新为；
-$$ h_{ji} = \exp\left(-\frac{d_{ji}^2}{2\sigma^2(n)}\right) $$
+
+$$
+h_{ji} = \exp\left(-\frac{d_{ji}^2}{2\sigma^2(n)}\right)
+$$
 
 除了高斯函数外，hexagon 和 square 等其他形式的邻域拓扑函数也可以使用。
 
 **自适应更新过程**
 
 获胜的神经元 与 其邻域神经元 权重更新的变化量为：
-$$ \Delta \mathbf{w}_j(n) = \eta(n) h_{ji(x)}(n) [\mathbf{x} - \mathbf{w}_j(n)] $$
+
+$$
+\Delta \mathbf{w}_j(n) = \eta(n) h_{ji(x)}(n) [\mathbf{x} - \mathbf{w}_j(n)]
+$$
 
 故权重更新公式为：
 
-$$ \mathbf{w}_j(n+1) = \mathbf{w}_j(n) + \eta(n)h_{ji}(n)[\mathbf{x}-\mathbf{w}_j(n)] $$
+$$
+\mathbf{w}_j(n+1) = \mathbf{w}_j(n) + \eta(n)h_{ji}(n)[\mathbf{x}-\mathbf{w}_j(n)]
+$$
 
 其中，$\eta(n)$为学习率,随着迭代次数更加而逐渐减小。其更新公式为：
-$$ \eta(n) = \eta_0 \exp\left(-\frac{n}{\tau_2}\right) $$
+
+$$
+\eta(n) = \eta_0 \exp\left(-\frac{n}{\tau_2}\right)
+$$
 
 其中，$\eta_0$为初始学习率，$\tau_2$为时间常数。
+
 - 学习率过大，会发生振荡，导致发散
 - 学习率过小，可能会陷入局部最优
-
 
 **在SOM中，权重可以理解为输入空间的隐变量，权重的更新是逼近输入变量空间分布的过程。而输出空间的神经元可以理解为隐变量的离散化表示。**
 
 从完全无序到收敛主要经历两个过程：自组织阶段和收敛阶段
+
 - 自组织阶段
   学习率和邻域函数的选择很关键
+
   - 学习率
     学习率从接近0.1开始，逐渐减小到0.01或以上。$\tau_2$选取为1000
   - 邻域函数
     邻域函数从整个网络开始，逐渐缩小到一个神经元。其中$\sigma_0$为网络的半径(外接圆，需要包含所有神经元)，可以定义为二维格子的半径。$\tau_1$可以定义为：
-    $$\tau_1 = \frac{1000}{\ln (\sigma_0)}$$
-
+    $$
+    \tau_1 = \frac{1000}{\ln (\sigma_0)}
+    $$
 - 收敛阶段
+
   - 一般规则：收敛阶段的迭代次数至少是网络神经元数量的500倍
 
 #### 总结
+
 SOM 算法的步骤：
+
 - 初始化：
   随机初始化权重向量，初始化的随机权重需要互不相同，而且应该权重幅值尽可能小
 - 抽样
@@ -111,8 +145,9 @@ SOM 算法的步骤：
   停止准则：
   - 迭代次数达到预设值
   - 映射不在发生明显的变化（权重）
-  
+
 最终得到的feature map 具有以下特征：
+
 - 输入空间的近似
   输入空间的数据，可以用输出空间近似表示
 - topological ordering
@@ -123,9 +158,12 @@ SOM 算法的步骤：
 - 维度缩减
 
 **如何确定SOM神经元的数量**
+
 - 针对已知的聚类数量，可以根据聚类数量确定神经元数量
 - 针对未知聚类问题
   同时选取多个神经元数量，进行聚类，观察聚类结果，确定合适的神经元数量
   - 得到的可能不是最优的，但可能是最合适的
 - 应用于降维等问题，set the number as you need
-  
+
+#### 总结：
+SOM 是一种降维的算法。其核心思想是：将输入映射到1D-2D的平面，同时保持拓扑的关系。利用的学习规则是competitive learning。其训练步骤为：1）初始化权重，权重需要设置的都不一样，而且幅值不能太大。2）在训练样本集中随机选点做训练。3）competition 过程。根据欧式距离，也就是discrimant function 求解出wining neuron. 4) cooperation 过程，winning neuron周围的neuron 也同时被激活。确定邻域neuron，可以用高斯函数确定。其距离为输出空间的点距离winning 的距离。sigma为宽度，控制了邻域的大小。5）weight updating。更新wining和邻域的权重，其learning rate 从0.1-0.001. SOM的特性：1）降维2）拓扑优化3）密度一致4）可视化。SOM的输出层神经元的选择与具体问题相关，如果已知聚类数k，则直接设置为k即可，如果未知，则需要多试几次选择最优，或自己按需制定。
